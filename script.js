@@ -86,7 +86,7 @@ function quality(resume){
  const email=/[\w.+-]+@[\w.-]+\.[a-z]{2,}/i.test(resume),phone=/\+?\d[\d\s().-]{7,}/.test(resume),length=Math.min(1,resume.length/2500);
  return Math.min(100,Math.round(35+sectionScore*25+Math.min(bullets,12)*1.5+Math.min(numbers,10)*1.5+(email?5:0)+(phone?5:0)+length*10));
 }
-function renderScore(id,val){$(id).textContent=val+"%";$("#"+id.replace("Score","Bar")).style.width=val+"%"}
+function renderScore(id,val){const scoreEl=$("#"+id),barEl=$("#"+id.replace("Score","Bar"));if(!scoreEl||!barEl)throw new Error("Analysis UI is missing a score element.");scoreEl.textContent=val+"%";barEl.style.width=val+"%"}
 function signal(label,value,kind){return '<div class="signal"><b>'+esc(label)+'</b><span class="'+kind+'">'+esc(value)+"</span></div>"}
 
 async function runAnalysis(){
