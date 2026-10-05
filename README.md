@@ -18,8 +18,6 @@ AI-powered resume analysis for ATS scoring, job matching, keywords, skills and r
 
 Resume text is extracted in the browser. Traditional ATS-style checks are combined with a lightweight local sentence-embedding model for semantic comparison against a supplied job description.
 
-The project is designed as a static web application and can be hosted on GitHub Pages.
-
 ## Privacy
 
 Resume content is processed in the browser. The project does not require a backend or an account for analysis.
