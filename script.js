@@ -31,10 +31,10 @@ async function extract(file){
  }
 
  if(ext==="docx"){
-  const {default:mammoth}=await import("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm");
+  if(!window.mammoth)throw new Error("DOCX engine failed to load. Please refresh the page and try again.");
   const ab=await file.arrayBuffer();
-  const r=await mammoth.extractRawText({arrayBuffer:ab});
-  return typeof r.value==="string"?r.value:"";
+  const parsed=await window.mammoth.extractRawText({arrayBuffer:ab});
+  return typeof parsed.value==="string"?parsed.value:"";
  }
 
  if(ext!=="pdf")throw new Error("Please select a PDF, DOCX or TXT file.");
