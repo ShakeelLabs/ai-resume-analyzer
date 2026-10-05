@@ -26,7 +26,9 @@ async function extract(file){
  const ext=dot>=0?filename.slice(dot+1).toLowerCase():"";
  if(!ext)throw new Error("Could not determine the file type.");
 
- if(ext==="txt")return await file.text();
+ if(ext==="txt"){
+  return typeof file.text==="function" ? await file.text() : "";
+ }
 
  if(ext==="docx"){
   const {default:mammoth}=await import("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm");
@@ -36,10 +38,9 @@ async function extract(file){
  }
 
  if(ext!=="pdf")throw new Error("Please select a PDF, DOCX or TXT file.");
+ if(!window.pdfjsLib)throw new Error("PDF engine failed to load. Please refresh the page and try again.");
 
- // Stable PDF.js browser build with an explicitly matched worker.
- const pdfjsLib=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.min.mjs");
- pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs";
+ pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
  const data=new Uint8Array(await file.arrayBuffer());
  const pdf=await pdfjsLib.getDocument({data}).promise;
