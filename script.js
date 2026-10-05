@@ -24,6 +24,7 @@ async function extract(file){
  if(ext==="txt")return await file.text();
  if(ext==="docx"){const {default:mammoth}=await import("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm");const ab=await file.arrayBuffer();const r=await mammoth.extractRawText({arrayBuffer:ab});return r.value}
  const pdfjsLib=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs");
+ pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
  const ab=await file.arrayBuffer(),pdf=await pdfjsLib.getDocument({data:ab}).promise,out=[];
  for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i),tc=await p.getTextContent();out.push(tc.items.map(x=>x.str).join(" "))}
  return out.join("\n");
