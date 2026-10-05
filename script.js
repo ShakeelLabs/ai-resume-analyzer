@@ -19,17 +19,37 @@ function setFile(file){
 function formatBytes(n){return n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KB":(n/1048576).toFixed(1)+" MB"}
 
 async function extract(file){
- const ext=file.name.toLowerCase().split(".").pop();
+ if(!(file instanceof File))throw new Error("Please select a valid resume file.");
+
+ const ext=(file.name||"").toLowerCase().split(".").pop();
+ if(!ext)throw new Error("Could not determine the file type.");
+
  if(ext==="txt")return await file.text();
- if(ext==="docx"){const {default:mammoth}=await import("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm");const ab=await file.arrayBuffer();const r=await mammoth.extractRawText({arrayBuffer:ab});return r.value}
 
- // Use PDF.js' explicit browser build instead of jsDelivr's /+esm auto-bundle.
- // The explicit build keeps GlobalWorkerOptions and the worker implementation aligned.
- const pdfjsLib=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.mjs");
- pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.worker.mjs";
+ if(ext==="docx"){
+  const {default:mammoth}=await import("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm");
+  const ab=await file.arrayBuffer();
+  const r=await mammoth.extractRawText({arrayBuffer:ab});
+  return r.value||"";
+ }
 
- const ab=await file.arrayBuffer(),pdf=await pdfjsLib.getDocument({data:ab}).promise,out=[];
- for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i),tc=await p.getTextContent();out.push(tc.items.map(x=>x.str).join(" "))}
+ if(ext!=="pdf")throw new Error("Please select a PDF, DOCX or TXT file.");
+
+ // PDF.js generic build. Worker is intentionally disabled for reliable static-hosting use.
+ const pdfjsLib=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.mjs");
+
+ const ab=await file.arrayBuffer();
+ const pdf=await pdfjsLib.getDocument({
+  data:new Uint8Array(ab),
+  disableWorker:true
+ }).promise;
+
+ const out=[];
+ for(let i=1;i<=pdf.numPages;i++){
+  const p=await pdf.getPage(i);
+  const tc=await p.getTextContent();
+  out.push(tc.items.map(x=>x.str||"").join(" "));
+ }
  return out.join("\n");
 }
 
