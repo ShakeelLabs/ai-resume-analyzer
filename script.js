@@ -1,4 +1,3 @@
-
 const $=s=>document.querySelector(s);
 const fileInput=$("#resumeFile"),dropzone=$("#dropzone"),fileTitle=$("#fileTitle"),fileHint=$("#fileHint"),fileStatus=$("#fileStatus"),jd=$("#jobDescription"),jdCount=$("#jdCount"),analyze=$("#analyzeBtn"),demo=$("#demoBtn"),status=$("#modelStatus"),results=$("#results");
 let selectedFile=null,extracting=false,embedder=null,pipeline=null;
@@ -23,8 +22,12 @@ async function extract(file){
  const ext=file.name.toLowerCase().split(".").pop();
  if(ext==="txt")return await file.text();
  if(ext==="docx"){const {default:mammoth}=await import("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm");const ab=await file.arrayBuffer();const r=await mammoth.extractRawText({arrayBuffer:ab});return r.value}
- const pdfjsLib=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs");
- pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+
+ // Use PDF.js' explicit browser build instead of jsDelivr's /+esm auto-bundle.
+ // The explicit build keeps GlobalWorkerOptions and the worker implementation aligned.
+ const pdfjsLib=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.mjs");
+ pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.worker.mjs";
+
  const ab=await file.arrayBuffer(),pdf=await pdfjsLib.getDocument({data:ab}).promise,out=[];
  for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i),tc=await p.getTextContent();out.push(tc.items.map(x=>x.str).join(" "))}
  return out.join("\n");
