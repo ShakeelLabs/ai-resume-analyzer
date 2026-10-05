@@ -1,11 +1,7 @@
-import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
-import * as mammoth from "https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm";
-import { pipeline, env } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.3";
-env.allowLocalModels=false; env.useBrowserCache=true;
 
 const $=s=>document.querySelector(s);
 const fileInput=$("#resumeFile"),dropzone=$("#dropzone"),fileTitle=$("#fileTitle"),fileHint=$("#fileHint"),fileStatus=$("#fileStatus"),jd=$("#jobDescription"),jdCount=$("#jdCount"),analyze=$("#analyzeBtn"),demo=$("#demoBtn"),status=$("#modelStatus"),results=$("#results");
-let selectedFile=null,extracting=false,embedder=null;
+let selectedFile=null,extracting=false,embedder=null,pipeline=null;
 
 const SKILLS=["javascript","typescript","python","java","c++","c#","react","angular","vue","node.js","node","express","sql","mysql","postgresql","mongodb","aws","azure","gcp","docker","kubernetes","git","github","html","css","excel","power bi","tableau","figma","photoshop","project management","project coordination","leadership","communication","problem solving","data analysis","machine learning","artificial intelligence","natural language processing","sales","marketing","recruitment","human resources","hr","administration","operations","customer service","account management","financial analysis","risk management","research","writing","seo","social media","content creation"];
 const STOP=new Set("the and for with from that this your have will are was were has our you not but all can job role work years into using their they about which who more than also other as an to of in on at is be by or".split(" "));
@@ -26,7 +22,8 @@ function formatBytes(n){return n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KB"
 async function extract(file){
  const ext=file.name.toLowerCase().split(".").pop();
  if(ext==="txt")return await file.text();
- if(ext==="docx"){const ab=await file.arrayBuffer();const r=await mammoth.extractRawText({arrayBuffer:ab});return r.value}
+ if(ext==="docx"){const {default:mammoth}=await import("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm");const ab=await file.arrayBuffer();const r=await mammoth.extractRawText({arrayBuffer:ab});return r.value}
+ const {default:pdfjsLib}=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs");
  const ab=await file.arrayBuffer(),pdf=await pdfjsLib.getDocument({data:ab}).promise,out=[];
  for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i),tc=await p.getTextContent();out.push(tc.items.map(x=>x.str).join(" "))}
  return out.join("\n");
@@ -49,6 +46,7 @@ async function semanticSimilarity(a,b){
  if(!b.trim())return .72;
  status.textContent="Loading local AI model for semantic job matching…";
  try{
+  if(!pipeline){const t=await import("https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.3");pipeline=t.pipeline;t.env.allowLocalModels=false;t.env.useBrowserCache=true;}
   if(!embedder)embedder=await pipeline("feature-extraction","Xenova/all-MiniLM-L6-v2",{dtype:"q8"});
   const [ea,eb]=await Promise.all([embedder(a.slice(0,5000),{pooling:"mean",normalize:true}),embedder(b.slice(0,5000),{pooling:"mean",normalize:true})]);
   let sum=0;for(let i=0;i<ea.data.length;i++)sum+=ea.data[i]*eb.data[i];
