@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="AI-powered resume analyzer for ATS scoring, job matching, keywords, skills and resume improvement.">
+<meta name="theme-color" content="#0b1020"><title>AI Resume Analyzer | ShakeelLabs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
+</head><body>
+<header class="topbar"><div class="wrap nav"><a class="brand" href="#"><span class="brand-mark">AI</span><span><b>AI Resume Analyzer</b><small>by ShakeelLabs</small></span></a><a class="github" href="https://github.com/ShakeelLabs/ai-resume-analyzer" target="_blank" rel="noopener">GitHub ↗</a></div></header>
+<main>
+<section class="hero"><div class="wrap hero-inner"><span class="eyebrow">SMART CAREER TOOL</span><h1>Analyze your resume.<br><span>Improve your chances.</span></h1><p>Upload a resume, add a job description, and get an ATS-style score, job match, keywords, skills and practical improvement suggestions.</p></div></section>
+<section class="wrap workspace">
+<div class="input-grid">
+<article class="panel upload-panel"><div class="panel-head"><div><span class="kicker">STEP 01</span><h2>Upload Resume</h2></div><span class="format">PDF / DOCX / TXT</span></div>
+<label class="dropzone" id="dropzone" for="resumeFile"><input id="resumeFile" type="file" accept=".pdf,.docx,.txt"><div class="upload-icon">↑</div><strong id="fileTitle">Drop your resume here</strong><span id="fileHint">or click to browse your files</span></label><div class="file-status" id="fileStatus">No resume selected</div></article>
+<article class="panel jd-panel"><div class="panel-head"><div><span class="kicker">STEP 02</span><h2>Job Description</h2></div><span class="optional">Optional</span></div>
+<textarea id="jobDescription" placeholder="Paste the job description here for a detailed job-match analysis..."></textarea><div class="counter"><span>Best results come from the complete job description.</span><span id="jdCount">0 characters</span></div></article>
+</div>
+<div class="action-row"><button class="primary" id="analyzeBtn" disabled>Analyze Resume <span>→</span></button><button class="secondary" id="demoBtn">Load Demo</button></div>
+<div class="model-status" id="modelStatus"></div>
+<section class="results" id="results" hidden>
+<div class="results-title"><div><span class="kicker">ANALYSIS RESULTS</span><h2>Your Resume Report</h2><p id="resultMeta"></p></div><button class="secondary" id="newBtn">Analyze Another</button></div>
+<div class="score-grid">
+<div class="score-card main-score"><span>ATS SCORE</span><div class="score-ring"><strong id="atsScore">0</strong><small>/100</small></div><p id="atsLabel">—</p></div>
+<div class="score-card"><span>JOB MATCH</span><strong class="big" id="matchScore">—</strong><div class="bar"><i id="matchBar"></i></div><p>Based on skills, keywords and semantic similarity.</p></div>
+<div class="score-card"><span>RESUME QUALITY</span><strong class="big" id="qualityScore">—</strong><div class="bar"><i id="qualityBar"></i></div><p>Structure, content and ATS-friendly signals.</p></div>
+<div class="score-card"><span>KEYWORD COVERAGE</span><strong class="big" id="keywordScore">—</strong><div class="bar"><i id="keywordBar"></i></div><p>Important terms found in your resume.</p></div>
+</div>
+<div class="report-grid">
+<article class="report-card"><div class="report-head"><h3>Matched Keywords</h3><span id="matchedCount">0</span></div><div class="chips" id="matchedKeywords"></div></article>
+<article class="report-card"><div class="report-head"><h3>Missing Keywords</h3><span id="missingCount">0</span></div><div class="chips missing" id="missingKeywords"></div></article>
+<article class="report-card"><div class="report-head"><h3>Detected Skills</h3><span id="skillsCount">0</span></div><div class="chips" id="skills"></div></article>
+<article class="report-card"><div class="report-head"><h3>Resume Signals</h3><span>Review</span></div><div class="signals" id="signals"></div></article>
+</div>
+<article class="report-card suggestions"><div class="report-head"><h3>Improvement Suggestions</h3><span id="suggestionCount">0</span></div><div id="suggestions"></div></article>
+</section></section></main>
+<footer><div class="wrap footer-inner"><span>AI Resume Analyzer</span><span>Built by ShakeelLabs · Browser-based analysis</span></div></footer>
+<script type="module" src="script.js"></script></body></html>
